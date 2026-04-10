@@ -1,0 +1,10 @@
+# macOS extended attributes
+*.DS_Store
+.DS_Store
+__MACOSX/
+
+# Temp files created at runtime
+/tmp/ghostty_init_*
+
+# Claude Code local settings
+.claude/
