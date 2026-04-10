@@ -6,6 +6,8 @@ I used to use [Go2Shell](https://zipzapmac.com/go2shell) together with macOS's b
 
 go2ghostty is a macOS Finder toolbar button that opens Ghostty in the current Finder directory, just like Go2Shell but for Ghostty.
 
+![Demo](https://resource.zyqcw.net/go2ghostty-demo.png)
+
 ## Features
 
 - One-click to open Ghostty from the Finder toolbar

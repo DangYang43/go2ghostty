@@ -6,6 +6,8 @@
 
 go2ghostty 是一个 macOS Finder 工具栏按钮，点击后会在当前 Finder 目录打开 Ghostty 终端 —— 类似 Go2Shell，但专为 Ghostty 设计。
 
+![演示](https://resource.zyqcw.net/go2ghostty-demo.png)
+
 ## 功能特性
 
 - 一键从 Finder 工具栏打开 Ghostty
