@@ -2,16 +2,17 @@
 path=$(osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as alias)')
 target="${path:-$HOME}"
 
-# macOS mktemp 不支持后缀，用 -t 生成基础名再重命名加 .zsh 后缀
-tmpbase=$(mktemp /tmp/ghostty_init_XXXXXX)
-tmpscript="${tmpbase}.zsh"
-mv "$tmpbase" "$tmpscript"
-chmod 700 "$tmpscript"
+if osascript -e 'application "Ghostty" is running' | grep -q true; then
+    # Ghostty 已在运行：通过 AppleScript 在现有进程中打开新窗口，不产生新的 Dock 图标
+    tmpbase=$(mktemp /tmp/ghostty_init_XXXXXX)
+    tmpscript="${tmpbase}.zsh"
+    mv "$tmpbase" "$tmpscript"
+    chmod 700 "$tmpscript"
 
-quoted_target=$(printf '%q' "$target")
-quoted_tmpscript=$(printf '%q' "$tmpscript")
+    quoted_target=$(printf '%q' "$target")
+    quoted_tmpscript=$(printf '%q' "$tmpscript")
 
-cat > "$tmpscript" << EOF
+    cat > "$tmpscript" << EOF
 #!/bin/zsh
 cd ${quoted_target}
 printf '\033[1;34m%s\033[0m\n' ${quoted_target}
@@ -19,5 +20,31 @@ rm -f ${quoted_tmpscript}
 exec /bin/zsh -il
 EOF
 
-# 用 -na 强制新实例，确保 Ghostty 已运行时 --args 也能生效
-open -na "Ghostty" --args -e "$tmpscript" &
+    as_script=$(printf '%s' "$tmpscript" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    osascript << APPLESCRIPT
+tell application "Ghostty"
+    new window with configuration {command:"${as_script}"}
+    activate
+end tell
+APPLESCRIPT
+else
+    # Ghostty 未运行：直接启动并通过 -e 指定初始脚本设置工作目录
+    # macOS mktemp 不支持后缀，用 -t 生成基础名再重命名加 .zsh 后缀
+    tmpbase=$(mktemp /tmp/ghostty_init_XXXXXX)
+    tmpscript="${tmpbase}.zsh"
+    mv "$tmpbase" "$tmpscript"
+    chmod 700 "$tmpscript"
+
+    quoted_target=$(printf '%q' "$target")
+    quoted_tmpscript=$(printf '%q' "$tmpscript")
+
+    cat > "$tmpscript" << EOF
+#!/bin/zsh
+cd ${quoted_target}
+printf '\033[1;34m%s\033[0m\n' ${quoted_target}
+rm -f ${quoted_tmpscript}
+exec /bin/zsh -il
+EOF
+
+    open -a "Ghostty" --args -e "$tmpscript" &
+fi

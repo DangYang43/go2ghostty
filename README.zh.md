@@ -14,6 +14,7 @@ go2ghostty 是一个 macOS Finder 工具栏按钮，点击后会在当前 Finder
 - 自动 `cd` 到当前 Finder 窗口所在目录
 - 在终端顶部以蓝色高亮显示当前目录路径
 - 若无 Finder 窗口打开，则回退到 `$HOME` 目录
+- 若 Ghostty 已在运行，新窗口在**同一进程内**打开，不会在程序坞产生额外图标
 
 ## 系统要求
 
@@ -56,5 +57,6 @@ go2ghostty 是一个 macOS Finder 工具栏按钮，点击后会在当前 Finder
 1. `get_finder_path`（工具栏二进制）被 macOS 触发
 2. 它调用 `go2ghostty`（bash 脚本）
 3. 脚本通过 AppleScript 查询 Finder 当前目录
-4. 创建临时初始化脚本，打印路径后 `exec` 进入交互式 zsh 会话
-5. Ghostty 打开新窗口运行该初始化脚本，正常加载你的 `.zshrc`
+4. 创建临时初始化脚本：`cd` 到目标目录、以蓝色打印路径，然后 `exec` 进入交互式 zsh 会话
+5. **若 Ghostty 已在运行**：通过 AppleScript（`new window with configuration {command: ...}`）在现有进程内打开新窗口，效果与按 `Cmd+N` 完全一致，程序坞不产生新图标
+6. **若 Ghostty 未运行**：通过 `open -a` 启动 Ghostty，并用 `-e` 传入初始化脚本

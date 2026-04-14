@@ -14,6 +14,7 @@ go2ghostty is a macOS Finder toolbar button that opens Ghostty in the current Fi
 - Automatically `cd` to the current Finder window's directory
 - Shows the current directory path highlighted in blue at the top of the terminal
 - Falls back to `$HOME` if no Finder window is open
+- If Ghostty is already running, opens a new window **inside the existing process** (no extra Dock icon)
 
 ## Requirements
 
@@ -56,5 +57,6 @@ When you click the toolbar button:
 1. `get_finder_path` (toolbar binary) is triggered by macOS
 2. It calls `go2ghostty` (bash script)
 3. The script queries Finder's current directory via AppleScript
-4. A temporary init script is created that prints the path and then `exec`s an interactive zsh session
-5. Ghostty opens a new window running that init script, which loads your `.zshrc` normally
+4. A temporary init script is created that `cd`s to the target directory, prints the path in blue, then `exec`s an interactive zsh session
+5. **If Ghostty is already running**, the script uses AppleScript (`new window with configuration {command: ...}`) to open a new window inside the existing Ghostty process — identical to pressing `Cmd+N`, with no new Dock icon
+6. **If Ghostty is not running**, it launches Ghostty via `open -a` and passes the init script with `-e`
