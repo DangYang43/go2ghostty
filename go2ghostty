@@ -19,5 +19,5 @@ rm -f ${quoted_tmpscript}
 exec /bin/zsh -i
 EOF
 
-# 用 -na 强制新实例，确保 Ghostty 已运行时 --args 也能生效
-open -na "Ghostty" --args -e "$tmpscript" &
+# 不使用 -n，让 Ghostty 在现有实例中打开新窗口
+open -a "Ghostty" --args -e "$tmpscript" &
